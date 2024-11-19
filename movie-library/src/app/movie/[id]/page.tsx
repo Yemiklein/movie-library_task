@@ -1,13 +1,35 @@
 /* eslint-disable @next/next/no-img-element */
-import { fetchMovieDetails } from "./../../utils/tmdb";
+
+"use client"; // Marks this file as a client component
+
+import { useEffect, useState } from "react";
+import { fetchMovieDetails } from "../../utils/tmdb";
 import { MovieDetails } from "../../../types/movie";
 
-interface Props {
-  params: { id: string };
+// Define Params type
+interface Params {
+  id: string;
 }
 
-export default async function MovieDetailsPage({ params }: Props) {
-  const movie: MovieDetails = await fetchMovieDetails(params.id);
+interface MovieDetailsPageProps {
+  params: Params; // params as passed by Next.js
+}
+
+export default function MovieDetailsPage({ params }: MovieDetailsPageProps) {
+  const [movie, setMovie] = useState<MovieDetails | null>(null);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const movieDetails = await fetchMovieDetails(params.id);
+      setMovie(movieDetails);
+    };
+
+    fetchData();
+  }, [params.id]);
+
+  if (!movie) {
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="p-4 min-h-screen flex flex-col justify-between items-center w-full bg-gray-100">
